@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Machines Man | Workpiece Studio</title>
+
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0b1120;
+  color: #edf4ff;
+}
+header {
+  padding: 18px 22px;
+  border-bottom: 1px solid #29384d;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+header a { color: #38bdf8; }
+main {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  gap: 18px;
+  padding: 20px;
+}
+.panel, .viewport {
+  background: #131e31;
+  border: 1px solid #29384d;
+  border-radius: 12px;
+  padding: 18px;
+  min-width: 0;
+}
+label {
+  display: block;
+  margin: 15px 0 7px;
+  color: #b8c6da;
+  font-size: 14px;
+}
+input, select, button {
+  width: 100%;
+  padding: 11px;
+  border-radius: 7px;
+  border: 1px solid #344760;
+  background: #0b1120;
+  color: white;
+}
+button {
+  background: #38bdf8;
+  color: #071421;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 12px;
+}
+button.secondary {
+  background: #24364e;
+  color: white;
+}
+#view {
+  height: 480px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #0a1424;
+}
+#view canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hint {
+  color: #a6b5cb;
+  line-height: 1.6;
+  font-size: 13px;
+}
+#status { color: #7dd3fc; overflow-wrap: anywhere; }
+@media(max-width: 720px) {
+  main { grid-template-columns: 1fr; padding: 12px; }
+  #view { height: 350px; }
+}
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+
+<body>
+<header>
+  <strong>⚙ MACHINES MAN — WORKPIECE STUDIO</strong>
+  <a href="./index.html">← Back to machine directory</a>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Virtual object</h2>
+    <p class="hint">Create a virtual stock object or import an STL/OBJ model.</p>
+
+    <label for="shape">Object shape</label>
+    <select id="shape">
+      <option value="block">Rectangular block</option>
+      <option value="cylinder">Cylinder</option>
+    </select>
+
+    <label for="length">Length / diameter (mm)</label>
+    <input id="length" type="number" value="100" min="1" max="1000">
+
+    <label for="width">Width (mm)</label>
+    <input id="width" type="number" value="60" min="1" max="1000">
+
+    <label for="height">Height (mm)</label>
+    <input id="height" type="number" value="20" min="1" max="1000">
+
+    <button id="create">Create / Update Object</button>
+
+    <label for="file">Import 3D model</label>
+    <input id="file" type="file" accept=".stl,.obj">
+
+    <button class="secondary" id="reset">Reset View</button>
+
+    <p id="status" role="status">Ready to create a workpiece.</p>
+    <p class="hint">
+      Imported models are previewed locally in your browser.
+      This prototype does not upload files or save projects online.
+    </p>
+  </section>
+
+  <section class="viewport">
+    <h2>3D Preview</h2>
+    <div id="view"></div>
+    <p class="hint">
+      Drag to rotate. Scroll or pinch to zoom.
+      Dimensions are entered in millimetres for the created stock.
+    </p>
+  </section>
+</main>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+const view = document.getElementById('view');
+const status = document.getElementById('status');
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a1424);
+
+const camera = new THREE.PerspectiveCamera(
+  45, view.clientWidth / view.clientHeight, 0.1, 10000
+);
+camera.position.set(150, 130, 180);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(view.clientWidth, view.clientHeight);
+view.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x53647c, 2));
+
+const light = new THREE.DirectionalLight(0xffffff, 2);
+light.position.set(100, 150, 100);
+scene.add(light);
+
+const grid = new THREE.GridHelper(300, 30, 0x42617e, 0x26384e);
+scene.add(grid);
+
+let currentObject = null;
+
+function setStatus(message) {
+  status.textContent = message;
+}
+
+function replaceObject(object) {
+  if (currentObject) {
+    scene.remove(currentObject);
+    currentObject.traverse(child => {
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) {
+        const materials = Array.isArray(child.material)
+          ? child.material : [child.material];
+        materials.forEach(material => material.dispose());
+      }
+    });
+  }
+
+  currentObject = object;
+  scene.add(currentObject);
+
+  const box = new THREE.Box3().setFromObject(currentObject);
+  const center = box.getCenter(new THREE.Vector3());
+  currentObject.position.sub(center);
+
+  const size = box.getSize(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z, 1);
+
+  camera.position.set(maxDim * 1.5, maxDim * 1.2, maxDim * 1.8);
+  controls.target.set(0, 0, 0);
+  controls.update();
+}
+
+function createObject() {
+  const length = Number(document.getElementById('length').value);
+  const width = Number(document.getElementById('width').value);
+  const height = Number(document.getElementById('height').value);
+
+  if (![length, width, height].every(
+    value => Number.isFinite(value) && value >= 1 && value <= 1000
+  )) {
+    setStatus('Enter dimensions between 1 and 1000 mm.');
+    return;
+  }
+
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x91a9c5,
+    metalness: 0.45,
+    roughness: 0.35
+  });
+
+  let geometry;
+  if (document.getElementById('shape').value === 'cylinder') {
+    geometry = new THREE.CylinderGeometry(
+      length / 2, length / 2, height, 64
+    );
+  } else {
+    geometry = new THREE.BoxGeometry(length, height, width);
+  }
+
+  const object = new THREE.Mesh(geometry, material);
+  replaceObject(object);
+
+  setStatus(`Created virtual ${document.getElementById('shape').value}: ${length} × ${width} × ${height} mm.`);
+}
+
+document.getElementById('create').addEventListener('click', createObject);
+
+document.getElementById('reset').addEventListener('click', () => {
+  camera.position.set(150, 130, 180);
+  controls.target.set(0, 0, 0);
+  controls.update();
+});
+
+document.getElementById('file').addEventListener('change', async event => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const extension = file.name.split('.').pop().toLowerCase();
+  if (!['stl', 'obj'].includes(extension)) {
+    setStatus('Please select an STL or OBJ file.');
+    return;
+  }
+
+  if (file.size > 25 * 1024 * 1024) {
+    setStatus('File is too large. Maximum size is 25 MB.');
+    return;
+  }
+
+  setStatus('Loading model...');
+
+  try {
+    const url = URL.createObjectURL(file);
+    let object;
+
+    try {
+      if (extension === 'stl') {
+        const geometry = await new STLLoader().loadAsync(url);
+        geometry.computeVertexNormals();
+        object = new THREE.Mesh(
+          geometry,
+          new THREE.MeshStandardMaterial({
+            color: 0x38bdf8,
+            metalness: 0.3,
+            roughness: 0.45
+          })
+        );
+      } else {
+        object = await new OBJLoader().loadAsync(url);
+        object.traverse(child => {
+          if (child.isMesh) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x38bdf8,
+              metalness: 0.3,
+              roughness: 0.45
+            });
+          }
+        });
+      }
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+
+    replaceObject(object);
+    setStatus(`Imported ${file.name}. Confirm the model's units and scale.`);
+  } catch (error) {
+    console.error(error);
+    setStatus('Could not load this model. Check the file and try another.');
+  }
+});
+
+function resize() {
+  const width = view.clientWidth;
+  const height = view.clientHeight;
+  if (!width || !height) return;
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height);
+}
+
+new ResizeObserver(resize).observe(view);
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+createObject();
+animate();
+</script>
+</body>
+</html>
