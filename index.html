@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Machines Man App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #101827;
+      color: white;
+      text-align: center;
+      padding: 50px 15px;
+    }
+    .card {
+      max-width: 400px;
+      margin: auto;
+      padding: 25px;
+      background: #1e293b;
+      border-radius: 18px;
+    }
+    button {
+      background: #38bdf8;
+      color: #102033;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Machines Man 🚀</h1>
+    <p id="message">Welcome to my first app!</p>
+    <button onclick="welcome()">Start App</button>
+  </div>
+
+  <script>
+    function welcome() {
+      document.getElementById("message").textContent =
+        "Success! My own app is running.";
+    }
+  </script>
+</body>
+</html>
