@@ -2,46 +2,450 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Machines Man App</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #101827;
-      color: white;
-      text-align: center;
-      padding: 50px 15px;
-    }
-    .card {
-      max-width: 400px;
-      margin: auto;
-      padding: 25px;
-      background: #1e293b;
-      border-radius: 18px;
-    }
-    button {
-      background: #38bdf8;
-      color: #102033;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machines Man | Manufacturing Hub</title>
+<style>
+:root {
+  --bg: #0b1120;
+  --panel: #131e31;
+  --panel2: #1c2a40;
+  --text: #edf4ff;
+  --muted: #a6b5cb;
+  --accent: #38bdf8;
+  --border: #2a3a52;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #0b1120ee;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 17px 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.logo { font-size: 23px; font-weight: 800; }
+.logo span { color: var(--accent); }
+nav { display: flex; gap: 18px; flex-wrap: wrap; }
+nav a { color: var(--muted); text-decoration: none; font-size: 14px; }
+nav a:hover { color: var(--accent); }
+.hero {
+  padding: 65px 6% 45px;
+  background: radial-gradient(ellipse at top right, #123d60, transparent 55%);
+}
+.tag {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 1px solid #245778;
+  border-radius: 20px;
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+h1 { font-size: clamp(34px, 6vw, 58px); margin: 18px 0; }
+.hero p { color: var(--muted); max-width: 650px; line-height: 1.8; }
+.searchbar {
+  margin-top: 25px;
+  display: flex;
+  gap: 10px;
+  max-width: 650px;
+}
+input, select {
+  width: 100%;
+  min-width: 0;
+  padding: 14px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 15px;
+}
+button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 9px;
+  padding: 13px 17px;
+  font-weight: 700;
+}
+.primary { background: var(--accent); color: #061522; }
+main { padding: 25px 6% 60px; }
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 15px 0 22px;
+}
+.section-head h2 { margin: 0; }
+.muted { color: var(--muted); font-size: 14px; }
+.filters { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 22px; }
+.filter {
+  background: var(--panel);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.filter.active, .filter:hover {
+  background: #123d57;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+  gap: 18px;
+}
+.machine {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform .2s, border-color .2s;
+}
+.machine:hover { transform: translateY(-4px); border-color: var(--accent); }
+.machine-top {
+  min-height: 130px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #1c314c, #101b2d);
+  font-size: 64px;
+}
+.machine-body { padding: 19px; }
+.category {
+  color: var(--accent);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.machine h3 { margin: 10px 0; font-size: 20px; }
+.machine p { color: var(--muted); font-size: 14px; line-height: 1.65; }
+.machine button { width: 100%; margin-top: 8px; }
+.details {
+  display: none;
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.details.open { display: block; }
+.empty {
+  display: none;
+  text-align: center;
+  padding: 40px 10px;
+  color: var(--muted);
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin: 32px 0;
+}
+.stat {
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.stat strong { display: block; font-size: 26px; color: var(--accent); }
+.stat span { color: var(--muted); font-size: 13px; }
+.info {
+  margin-top: 45px;
+  padding: 28px;
+  border-radius: 15px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+.info p { color: var(--muted); line-height: 1.8; }
+footer {
+  padding: 25px 6%;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+@media(max-width:600px) {
+  header { align-items: flex-start; flex-direction: column; }
+  nav { gap: 13px; }
+  .hero { padding-top: 42px; }
+  .searchbar { flex-direction: column; }
+}
+</style>
 </head>
 <body>
-  <div class="card">
-    <h1>Machines Man 🚀</h1>
-    <p id="message">Welcome to my first app!</p>
-    <button onclick="welcome()">Start App</button>
+
+<header>
+  <div class="logo">⚙ MACHINES <span>MAN</span></div>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#machines">Machines</a>
+    <a href="#about">About</a>
+  </nav>
+</header>
+
+<section class="hero" id="home">
+  <span class="tag">MANUFACTURING KNOWLEDGE HUB</span>
+  <h1>Explore the World of<br><span style="color:#38bdf8">Industrial Machines.</span></h1>
+  <p>
+    Discover machining and manufacturing equipment, understand how
+    machines work, explore their applications, and learn the basics
+    of modern industrial production.
+  </p>
+  <div class="searchbar">
+    <input id="search" type="search"
+      placeholder="Search CNC, laser cutting, grinding..."
+      aria-label="Search machines">
+    <button class="primary" onclick="searchMachines()">Search</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><strong id="total">8</strong><span>Machine categories</span></div>
+    <div class="stat"><strong>01</strong><span>Learning hub</span></div>
+    <div class="stat"><strong>24/7</strong><span>Reference access</span></div>
+  </div>
+</section>
+
+<main id="machines">
+  <div class="section-head">
+    <div>
+      <h2>Machine Directory</h2>
+      <p class="muted">Select a machine to explore its working principle.</p>
+    </div>
+    <span class="muted" id="count">8 machines</span>
   </div>
 
-  <script>
-    function welcome() {
-      document.getElementById("message").textContent =
-        "Success! My own app is running.";
-    }
-  </script>
+  <div class="filters" id="filters">
+    <button class="filter active" data-filter="All">All Machines</button>
+    <button class="filter" data-filter="Machining">Machining</button>
+    <button class="filter" data-filter="Cutting">Cutting</button>
+    <button class="filter" data-filter="Moulding">Moulding</button>
+    <button class="filter" data-filter="Finishing">Finishing</button>
+  </div>
+
+  <div class="grid" id="grid">
+
+    <article class="machine" data-category="Machining"
+      data-search="cnc computer numerical control lathe turning automated">
+      <div class="machine-top">⚙️</div>
+      <div class="machine-body">
+        <span class="category">Machining</span>
+        <h3>CNC Machine</h3>
+        <p>Computer-controlled equipment that produces accurate components by programmed tool movement.</p>
+        <button class="primary" onclick="toggleDetails(this)">Explore machine +</button>
+        <div class="details">
+          <b>Working:</b> A CNC controller executes programmed tool paths.<br>
+          <b>Operations:</b> Turning, drilling, boring and contouring, depending on the machine.<br>
+          <b>Applications:</b> Automotive parts, shafts and precision components.<br>
+          <b>Key feature:</b> Repeatable, programmable machining.
+        </div>
+      </div>
+    </article>
+
+    <article class="machine" data-category="Machining"
+      data-search="vmc vertical machining center milling drilling tapping">
+      <div class="machine-top">🏭</div>
+      <div class="machine-body">
+        <span class="category">Machining</span>
+        <h3>VMC Machine</h3>
+        <p>A vertical machining centre uses a vertically oriented spindle for precision machining.</p>
+        <button class="primary" onclick="toggleDetails(this)">Explore machine +</button>
+        <div class="details">
+          <b>Working:</b> A rotating cutting tool removes material as programmed axes move the tool or workpiece.<br>
+          <b>Operations:</b> Milling, drilling, boring and tapping when suitably equipped.<br>
+          <b>Applications:</b> Dies, moulds, fixtures and machine components.<br>
+          <b>Key feature:</b> Multiple operations in one setup.
+        </div>
+      </div>
+    </article>
+
+    <article class="machine" data-category="Cutting"
+      data-search="laser cutting fibre laser sheet metal engraving">
+      <div class="machine-top">🔦</div>
+      <div class="machine-body">
+        <span class="category">Cutting</span>
+        <h3>Laser Cutting Machine</h3>
+        <p>Uses a focused laser beam to cut or engrave suitable materials with programmed precision.</p>
+        <button class="primary" onclick="toggleDetails(this)">Explore machine +</button>
+        <div class="details">
+          <b>Working:</b> A focused beam heats material; assist gas may remove molten or vaporised material.<br>
+          <b>Types:</b> Fibre and CO₂ laser systems, selected according to material and application.<br>
+          <b>Applications:</b> Sheet-metal profiles, panels and signage.<br>
+          <b>Safety:</b> Enclosure, interlocks and wavelength-appropriate protection are essential.
+        </div>
+      </div>
+    </article>
+
+    <article class="machine" data-category="Moulding"
+      data-search="injection moulding plastic polymer mould">
+      <div class="machine-top">🧩</div>
+      <div class="machine-body">
+        <span class="category">Moulding</span>
+        <h3>Injection Moulding</h3>
+        <p>Produces plastic components by injecting molten polymer into a mould cavity.</p>
+        <button class="primary" onclick="toggleDetails(this)">Explore machine +</button>
+        <div class="details">
+          <b>Working:</b> Plastic pellets are melted, injected, cooled and ejected.<br>
+          <b>Main parts:</b> Injection unit, clamping unit and mould.<br>
+          <b>Applications:</b> Housings, containers, automotive trim and consumer products.<br>
+          <b>Key feature:</b> Efficient high-volume production.
+        </div>
+      </div>
+    </article>
+
+    <article class="machine" data-category="Machining"
+      data-search="milling machine cutter workpiece conventional milling">
+      <div class="machine-top">🔩</div>
+      <div class="machine-body">
+        <span class="category">Machining</span>
+        <h3>Milling Machine</h3>
+        <p>Removes material with a rotating multi-edge cutter to create surfaces, slots and profiles.</p>
+        <button class="primary" onclick="toggleDetails(this)">Explore machine +</button>
+        <div class="details">
+          <b>Working:</b> A rotating cutter removes material from a secured workpiece.<br>
+          <b>Types:</b> Vertical, horizontal and universal milling machines.<br>
+          <b>Applications:</b> Slots, keyways, flat surfaces and complex profiles.<br>
+          <b>Key feature:</b> Versatile material removal.
+        </div>
+      </div>
+    </article>
+
+    <article class="machine" data-category="Machining"
+      data-search="tapping machine thread tap internal threading">
+      <div class="machine-top">🛠️</div>
+      <div class="machine-body">
+        <span class="category">Machining</span>
+        <h3>Tapping Machine</h3>
+        <p>Creates internal screw threads in drilled holes using a suitable tap.</p>
+        <button class="primary" onclick="toggleDetails(this)">Explore machine +</button>
+        <div class="details">
+          <b>Working:</b> A tap rotates into a correctly sized prepared hole.<br>
+          <b>Types:</b> Hand, power and rigid CNC tapping systems.<br>
+          <b>Applications:</b> Threaded holes in metal and suitable plastics.<br>
+          <b>Key feature:</b> Repeatable internal threading.
+        </div>
+      </div>
+    </article>
+
+    <article class="machine" data-category="Finishing"
+      data-search="grinding machine abrasive wheel surface cylindrical">
+      <div class="machine-top">⚡</div>
+      <div class="machine-body">
+        <span class="category">Finishing</span>
+        <h3>Grinding Machine</h3>
+        <p>Uses an abrasive wheel to achieve fine finishes and accurate dimensions.</p>
+        <button class="primary" onclick="toggleDetails(this)">Explore machine +</button>
+        <div class="details">
+          <b>Working:</b> Abrasive grains remove small amounts of material.<br>
+          <b>Types:</b> Surface, cylindrical and centreless grinding.<br>
+          <b>Applications:</b> Precision shafts, tools and finished surfaces.<br>
+          <b>Safety:</b> Use guards and the correct wheel speed; inspect wheels before use.
+        </div>
+      </div>
+    </article>
+
+    <article class="machine" data-category="Machining"
+      data-search="drilling machine drill holes radial pillar">
+      <div class="machine-top">🔧</div>
+      <div class="machine-body">
+        <span class="category">Machining</span>
+        <h3>Drilling Machine</h3>
+        <p>Creates holes in a workpiece using a rotating drill bit and controlled feed.</p>
+        <button class="primary" onclick="toggleDetails(this)">Explore machine +</button>
+        <div class="details">
+          <b>Working:</b> A rotating drill advances into the securely clamped material.<br>
+          <b>Types:</b> Bench, pillar, radial and CNC drilling systems.<br>
+          <b>Applications:</b> Fastener holes, fixtures and component fabrication.<br>
+          <b>Key feature:</b> Simple and versatile hole production.
+        </div>
+      </div>
+    </article>
+
+  </div>
+  <div class="empty" id="empty">No matching machines found. Try another search.</div>
+
+  <section class="info" id="about">
+    <h2>About Machines Man</h2>
+    <p>
+      Machines Man is a manufacturing learning directory for students,
+      engineers and workshop enthusiasts. Learn about machine types,
+      operating principles, applications and important safety practices.
+    </p>
+    <p>
+      This version is an educational reference. It does not control
+      industrial equipment, generate verified machining parameters,
+      or replace machine-specific training and operating manuals.
+    </p>
+  </section>
+</main>
+
+<footer>
+  © 2026 Machines Man · Manufacturing Knowledge Hub
+</footer>
+
+<script>
+const cards = [...document.querySelectorAll(".machine")];
+let activeCategory = "All";
+
+function updateMachines() {
+  const query = document.getElementById("search").value
+    .trim().toLowerCase();
+  let visible = 0;
+
+  cards.forEach(card => {
+    const matchesCategory =
+      activeCategory === "All" ||
+      card.dataset.category === activeCategory;
+    const matchesSearch =
+      (card.innerText + " " + card.dataset.search)
+        .toLowerCase().includes(query);
+
+    const show = matchesCategory && matchesSearch;
+    card.style.display = show ? "" : "none";
+    if (show) visible++;
+  });
+
+  document.getElementById("count").textContent =
+    visible + (visible === 1 ? " machine" : " machines");
+  document.getElementById("empty").style.display =
+    visible ? "none" : "block";
+}
+
+function searchMachines() {
+  updateMachines();
+  document.getElementById("machines").scrollIntoView({
+    behavior: "smooth"
+  });
+}
+
+function toggleDetails(button) {
+  const details = button.nextElementSibling;
+  const opening = !details.classList.contains("open");
+  details.classList.toggle("open", opening);
+  button.textContent = opening ? "Close details −" : "Explore machine +";
+}
+
+document.getElementById("search").addEventListener("input", updateMachines);
+
+document.querySelectorAll(".filter").forEach(button => {
+  button.addEventListener("click", () => {
+    activeCategory = button.dataset.filter;
+    document.querySelectorAll(".filter").forEach(item =>
+      item.classList.toggle("active", item === button)
+    );
+    updateMachines();
+  });
+});
+</script>
 </body>
 </html>
