@@ -1,0 +1,89 @@
+/* Machines Man — Industrial Realistic / Professional Theme
+   Add this file to the repository root and link it after each page's existing <style> block. */
+:root {
+  --bg: #e7ebef !important;
+  --panel: #f7f9fb !important;
+  --panel2: #e5ebf0 !important;
+  --cyan: #1769aa !important;
+  --text: #1e2933 !important;
+  --muted: #596a78 !important;
+  --border: #b7c2cc !important;
+  --orange: #ef8b24 !important;
+}
+html { background: #e7ebef; }
+body {
+  background: linear-gradient(180deg, #e9edf1 0%, #dbe2e8 100%) !important;
+  color: #1e2933 !important;
+}
+header {
+  background: linear-gradient(120deg, #202b35, #344452) !important;
+  color: #f6f8fa !important;
+  border-bottom: 4px solid #ef8b24 !important;
+  box-shadow: 0 4px 18px rgba(16, 30, 42, .2);
+}
+header .logo { color: #f6f8fa !important; letter-spacing: .7px; }
+header .logo span, header a { color: #ffad48 !important; }
+header a { font-weight: 700; }
+main { max-width: 1320px; }
+.intro h1, h1, h2, h3 { color: #1e2933 !important; }
+.intro p { color: #536574 !important; }
+.panel, .card, .machine-card, section.panel {
+  background: linear-gradient(145deg, #ffffff, #eef2f5) !important;
+  color: #1e2933 !important;
+  border: 1px solid #bac5ce !important;
+  border-top: 3px solid #3e596d !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 22px rgba(30, 45, 58, .10) !important;
+}
+.metric, .step, .field, .controls {
+  color: #253440;
+}
+.metric, .step {
+  background: #e7edf2 !important;
+  border-color: #c0cbd4 !important;
+}
+.step.active {
+  background: #dbeaf6 !important;
+  border-color: #1769aa !important;
+  color: #123c5b !important;
+}
+.step.done { border-color: #41836b !important; color: #24634c !important; }
+label, .status, .note, .metric small { color: #536574 !important; }
+select, input:not([type="range"]), textarea {
+  background: #fff !important;
+  color: #1e2933 !important;
+  border: 1px solid #9eacb8 !important;
+  border-radius: 6px !important;
+}
+input[type="range"], progress { accent-color: #1769aa !important; }
+button, .primary {
+  background: linear-gradient(180deg, #247dbd, #145b91) !important;
+  color: #fff !important;
+  border: 1px solid #124e7a !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 0 #0e4269 !important;
+}
+button:hover, .primary:hover { filter: brightness(1.08); }
+button.secondary {
+  background: linear-gradient(180deg, #596b79, #394b59) !important;
+  color: #fff !important;
+  border: 1px solid #344654 !important;
+  box-shadow: 0 2px 0 #273641 !important;
+}
+.pill {
+  background: #e7edf2 !important;
+  color: #314453 !important;
+  border-color: #aebbc5 !important;
+}
+footer { color: #596a78 !important; }
+canvas {
+  border: 1px solid #526777 !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 5px 18px rgba(16,30,42,.18);
+}
+/* Homepage card compatibility */
+.machine-card img, .card img { border-radius: 8px; }
+a { transition: color .15s ease; }
+@media (max-width: 700px) {
+  header { padding: 16px 5%; }
+  main { padding: 20px 12px 36px; }
+}
