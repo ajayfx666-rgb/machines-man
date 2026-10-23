@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machines Man | Laser Cutting Simulation</title>
+<style>
+:root{--bg:#08111f;--panel:#111f32;--panel2:#172941;--cyan:#38c8ff;--text:#eaf4ff;--muted:#a8bed6;--border:#2b4562;--red:#ff5a62}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+header{padding:20px 5%;border-bottom:1px solid var(--border);background:#0b1525;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:24px}.logo span{color:var(--cyan)}header a{color:var(--cyan);text-decoration:none}
+main{max-width:1200px;margin:auto;padding:26px 18px 50px}.intro h1{margin:0 0 8px;font-size:clamp(26px,4vw,38px)}.intro p{color:var(--muted);line-height:1.6;margin-top:0}
+.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(270px,1fr);gap:18px;margin-top:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;min-width:0}.panel h2{font-size:18px;margin:0 0 15px}
+.scene{background:radial-gradient(ellipse at center,#1c3550,#091322 75%);border-radius:12px;overflow:hidden;position:relative}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/10}
+.status{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:12px 0;color:var(--muted);font-size:14px}.pill{border:1px solid var(--border);border-radius:999px;padding:6px 10px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}label{font-size:13px;color:var(--muted)}select,input[type=range]{width:100%}select{background:#0a1727;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px}input[type=range]{accent-color:var(--cyan)}.value{font-size:13px;color:var(--cyan)}
+.buttons{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}button{background:var(--cyan);color:#03111d;border:0;border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer}button.secondary{background:#223a55;color:var(--text);border:1px solid var(--border)}button:disabled{opacity:.45;cursor:not-allowed}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.metric{background:var(--panel2);padding:12px;border-radius:10px}.metric small{display:block;color:var(--muted);margin-bottom:5px}.metric strong{font-size:20px}
+.note{font-size:12px;line-height:1.55;color:var(--muted);margin-top:15px}.steps{display:grid;gap:8px}.step{padding:10px 12px;background:#0c192a;border:1px solid var(--border);border-radius:9px;color:var(--muted)}.step.active{border-color:var(--cyan);color:var(--text);background:#123047}.step.done{border-color:#277b73;color:#a5f4dc}
+progress{width:100%;height:10px;accent-color:var(--cyan)}footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.controls{grid-template-columns:1fr 1fr}}@media(max-width:450px){.controls{grid-template-columns:1fr}.field.full{grid-column:auto}}
+</style>
+</head>
+<body>
+<header><div class="logo">⚙ MACHINES <span>MAN</span></div><a href="index.html">← Back to Machines</a></header>
+<main>
+<section class="intro"><h1>Laser Cutting Machine Simulation</h1><p>Explore a simplified laser-cutting process. Choose a material and pattern, then run the visual simulation to see a laser head trace a path across a sheet.</p></section>
+<div class="layout">
+<section class="panel"><h2>Live cutting view</h2><div class="scene"><canvas id="scene" width="960" height="600" aria-label="Laser cutting simulation canvas"></canvas></div>
+<div class="status"><span class="pill" id="status">Ready</span><span id="phase">Phase: Setup</span></div>
+<label for="progress">Cutting progress</label><progress id="progress" max="100" value="0"></progress>
+<div class="metrics"><div class="metric"><small>Progress</small><strong id="percent">0%</strong></div><div class="metric"><small>Elapsed time</small><strong id="elapsed">0.0 s</strong></div><div class="metric"><small>Path length</small><strong id="pathLength">0 mm</strong></div><div class="metric"><small>Estimated cut time</small><strong id="estimated">0.0 s</strong></div></div>
+<div class="buttons"><button id="start">▶ Start cutting</button><button class="secondary" id="pause" disabled>Ⅱ Pause</button><button class="secondary" id="reset">↺ Reset</button></div>
+</section>
+<aside class="panel"><h2>Machine settings</h2><div class="controls">
+<div class="field"><label for="material">Sheet material</label><select id="material"><option value="Mild steel">Mild steel (demo)</option><option value="Stainless steel">Stainless steel (demo)</option><option value="Acrylic">Acrylic (demo)</option><option value="Plywood">Plywood (demo)</option></select></div>
+<div class="field"><label for="pattern">Cutting pattern</label><select id="pattern"><option value="rectangle">Rectangle</option><option value="circle">Circle</option><option value="star">Star</option><option value="letters">Simple initials path</option></select></div>
+<div class="field full"><label for="power">Laser power (visual setting) <span class="value" id="powerValue">70%</span></label><input id="power" type="range" min="10" max="100" value="70"></div>
+<div class="field full"><label for="speed">Cutting speed <span class="value" id="speedValue">60 mm/s</span></label><input id="speed" type="range" min="10" max="120" value="60"></div>
+<div class="field full"><label for="scale">Pattern size <span class="value" id="scaleValue">70%</span></label><input id="scale" type="range" min="40" max="90" value="70"></div>
+</div>
+<h2 style="margin-top:24px">Process stages</h2><div class="steps" id="steps"><div class="step active">1. Secure sheet and set pattern</div><div class="step">2. Laser head moves to start point</div><div class="step">3. Laser follows the programmed path</div><div class="step">4. Cutting path completed</div></div>
+<p class="note">Educational visualisation only. It does not calculate real laser parameters, material compatibility, kerf, gas pressure, or safe machine settings. Never use these demo settings to operate a real laser cutter. Real laser equipment requires trained supervision, enclosure, extraction, and material-specific safety procedures.</p>
+</aside>
+</div>
+<footer>Machines Man · Interactive learning prototype</footer>
+</main>
+<script>
+const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id);
+let running=false,paused=false,progress=0,elapsed=0,last=0,raf=null,paths=[],totalLength=0;
+function makePaths(){
+ const s=+$('scale').value/100,cx=480,cy=300,w=340*s,h=220*s;
+ if($('pattern').value==='rectangle')return [[{x:cx-w/2,y:cy-h/2},{x:cx+w/2,y:cy-h/2},{x:cx+w/2,y:cy+h/2},{x:cx-w/2,y:cy+h/2},{x:cx-w/2,y:cy-h/2}]];
+ if($('pattern').value==='circle'){let a=[];for(let i=0;i<=120;i++){let t=i/120*Math.PI*2;a.push({x:cx+145*s*Math.cos(t),y:cy+145*s*Math.sin(t)});}return [a];}
+ if($('pattern').value==='star'){let a=[];for(let i=0;i<=10;i++){let t=-Math.PI/2+i*Math.PI/5,r=(i%2===0?160:70)*s;a.push({x:cx+r*Math.cos(t),y:cy+r*Math.sin(t)});}return [a];}
+ return [[{x:cx-120*s,y:cy-70*s},{x:cx-120*s,y:cy+70*s},{x:cx-55*s,y:cy-70*s},{x:cx-55*s,y:cy+70*s}], [{x:cx+10*s,y:cy-70*s},{x:cx+10*s,y:cy+70*s},{x:cx+110*s,y:cy+70*s},{x:cx+110*s,y:cy-70*s}]];
+}
+function lengthPath(p){let n=0;for(let i=1;i<p.length;i++)n+=Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y);return n}
+function setup(){paths=makePaths();totalLength=paths.reduce((a,p)=>a+lengthPath(p),0);$('pathLength').textContent=Math.round(totalLength/2)+' mm';$('estimated').textContent=(totalLength/2/(+$('speed').value)).toFixed(1)+' s';draw();}
+function pointAt(t){let remain=totalLength*t;for(const p of paths){for(let i=1;i<p.length;i++){let d=Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y);if(remain<=d){let q=d?remain/d:0;return{x:p[i-1].x+(p[i].x-p[i-1].x)*q,y:p[i-1].y+(p[i].y-p[i-1].y)*q};}remain-=d;}}return paths[paths.length-1].at(-1)}
+function draw(){
+ const W=canvas.width,H=canvas.height;ctx.clearRect(0,0,W,H);
+ // bed and metal sheet
+ ctx.fillStyle='#172638';ctx.fillRect(55,55,850,490);
+ ctx.strokeStyle='#2c4861';ctx.lineWidth=2;for(let x=75;x<900;x+=28){ctx.beginPath();ctx.moveTo(x,65);ctx.lineTo(x,535);ctx.stroke();}
+ ctx.fillStyle=$('material').value==='Acrylic'?'#284d68':$('material').value==='Plywood'?'#76583b':'#64788a';ctx.fillRect(115,95,730,410);
+ ctx.strokeStyle='#91a6b8';ctx.lineWidth=2;ctx.strokeRect(115,95,730,410);
+ // subtle sheet grid
+ ctx.strokeStyle='rgba(230,245,255,.10)';ctx.lineWidth=1;for(let x=135;x<845;x+=35){ctx.beginPath();ctx.moveTo(x,105);ctx.lineTo(x,495);ctx.stroke();}for(let y=115;y<500;y+=35){ctx.beginPath();ctx.moveTo(125,y);ctx.lineTo(835,y);ctx.stroke();}
+ // completed cutting path
+ let remain=progress*totalLength;
+ for(const p of paths){ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);for(let i=1;i<p.length;i++)ctx.lineTo(p[i].x,p[i].y);ctx.strokeStyle='rgba(9,20,31,.95)';ctx.lineWidth=7;ctx.stroke();
+   let local=Math.min(remain,lengthPath(p));ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);for(let i=1;i<p.length;i++){let d=Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y);if(local>=d){ctx.lineTo(p[i].x,p[i].y);local-=d;}else{let q=d?local/d:0;ctx.lineTo(p[i-1].x+(p[i].x-p[i-1].x)*q,p[i-1].y+(p[i].y-p[i-1].y)*q);break;}}ctx.strokeStyle='#ff9b72';ctx.lineWidth=3;ctx.shadowColor='#ff4c35';ctx.shadowBlur=8;ctx.stroke();ctx.shadowBlur=0;remain-=Math.min(remain,lengthPath(p));}
+ let pos=pointAt(progress); // gantry and laser head
+ ctx.strokeStyle='#a9bed0';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(pos.x-48,48);ctx.lineTo(pos.x+48,48);ctx.stroke();
+ ctx.fillStyle='#c7d8e8';ctx.fillRect(pos.x-24,45,48,38);ctx.fillStyle='#7b91a5';ctx.fillRect(pos.x-14,80,28,23);
+ ctx.strokeStyle='#ff5a62';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(pos.x,pos.y-35);ctx.lineTo(pos.x,pos.y-5);ctx.stroke();
+ ctx.fillStyle='#ff554b';ctx.shadowColor='#ff3020';ctx.shadowBlur=20;ctx.beginPath();ctx.arc(pos.x,pos.y,7+Math.random()*2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+ ctx.fillStyle='#dceafa';ctx.font='16px Arial';ctx.fillText('LASER HEAD',pos.x+30,70);
+ ctx.fillStyle='rgba(5,12,20,.75)';ctx.fillRect(125,455,210,30);ctx.fillStyle='#eaf4ff';ctx.font='14px Arial';ctx.fillText('Sheet bed · Top view',138,475);
+}
+function updateUI(){let p=Math.round(progress*100);$('progress').value=p;$('percent').textContent=p+'%';$('elapsed').textContent=elapsed.toFixed(1)+' s';$('status').textContent=progress>=1?'Completed':paused?'Paused':running?'Cutting':'Ready';$('phase').textContent='Phase: '+(progress>=1?'Complete':progress>0?'Cutting path': 'Setup');$('pause').disabled=!running;const steps=[...document.querySelectorAll('.step')];steps.forEach((e,i)=>{e.classList.toggle('active',i===(progress>=1?3:progress>0?2:0));e.classList.toggle('done',i<(progress>=1?4:progress>0?2:0));});}
+function tick(now){if(!running)return;if(!last)last=now;let dt=Math.min((now-last)/1000,.1);last=now;elapsed+=dt;progress=Math.min(1,progress+dt*(+$('speed').value)/Math.max(totalLength/2,1));draw();updateUI();if(progress>=1){running=false;paused=false;updateUI();return;}raf=requestAnimationFrame(tick)}
+$('start').onclick=()=>{if(progress>=1){progress=0;elapsed=0;}running=true;paused=false;last=0;updateUI();raf=requestAnimationFrame(tick)};
+$('pause').onclick=()=>{running=false;paused=true;if(raf)cancelAnimationFrame(raf);updateUI();};
+$('reset').onclick=()=>{running=false;paused=false;progress=0;elapsed=0;last=0;if(raf)cancelAnimationFrame(raf);setup();updateUI();};
+['material','pattern','scale'].forEach(id=>$(id).addEventListener('input',()=>{if(!running){progress=0;elapsed=0;setup();updateUI();}}));
+$('power').oninput=()=>{$('powerValue').textContent=$('power').value+'%';draw()};
+$('speed').oninput=()=>{$('speedValue').textContent=$('speed').value+' mm/s';$('estimated').textContent=(totalLength/2/(+$('speed').value)).toFixed(1)+' s'};
+$('scale').oninput=()=>{$('scaleValue').textContent=$('scale').value+'%';};
+setup();updateUI();
+</script>
+</body>
+</html>
