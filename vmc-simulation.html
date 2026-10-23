@@ -1,48 +1,97 @@
-<a class="primary" href="./milling-simulation.html">
-  Open Milling Simulation →
-</a>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Machines Man | Milling Simulation</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machines Man | Laser Cutting Simulation</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#0b1120;color:#edf4ff;font-family:Arial,sans-serif}header{padding:16px 22px;border-bottom:1px solid #29384d;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}a{color:#38bdf8;text-decoration:none}main{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;padding:16px}.panel,.viewer{background:#131e31;border:1px solid #29384d;border-radius:12px;padding:16px;min-width:0}label{display:block;margin:12px 0 6px;color:#b8c6da;font-size:13px}input,select,button{width:100%;padding:10px;border:1px solid #344760;border-radius:7px;background:#0b1120;color:white}button{margin-top:10px;background:#38bdf8;color:#071421;border:0;font-weight:bold;cursor:pointer}button.secondary{background:#26384e;color:white}button:disabled{opacity:.5}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.hint{font-size:12px;line-height:1.5;color:#a6b5cb}#view{height:520px;border-radius:8px;overflow:hidden}#view canvas{display:block}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{margin-top:10px;padding:9px;background:#0b1120;border:1px solid #29384d;border-radius:8px;font-size:12px}.stat b{display:block;margin-top:5px;font-size:14px}.progress{height:8px;background:#26384e;margin-top:12px;border-radius:8px;overflow:hidden}#bar{height:100%;width:0;background:#38bdf8}#status{color:#7dd3fc;font-size:13px;line-height:1.5}@media(max-width:800px){main{grid-template-columns:1fr;padding:10px}#view{height:380px}}
+:root{--bg:#08111f;--panel:#111f32;--panel2:#172941;--cyan:#38c8ff;--text:#eaf4ff;--muted:#a8bed6;--border:#2b4562;--red:#ff5a62}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+header{padding:20px 5%;border-bottom:1px solid var(--border);background:#0b1525;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:24px}.logo span{color:var(--cyan)}header a{color:var(--cyan);text-decoration:none}
+main{max-width:1200px;margin:auto;padding:26px 18px 50px}.intro h1{margin:0 0 8px;font-size:clamp(26px,4vw,38px)}.intro p{color:var(--muted);line-height:1.6;margin-top:0}
+.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(270px,1fr);gap:18px;margin-top:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;min-width:0}.panel h2{font-size:18px;margin:0 0 15px}
+.scene{background:radial-gradient(ellipse at center,#1c3550,#091322 75%);border-radius:12px;overflow:hidden;position:relative}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/10}
+.status{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:12px 0;color:var(--muted);font-size:14px}.pill{border:1px solid var(--border);border-radius:999px;padding:6px 10px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}label{font-size:13px;color:var(--muted)}select,input[type=range]{width:100%}select{background:#0a1727;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px}input[type=range]{accent-color:var(--cyan)}.value{font-size:13px;color:var(--cyan)}
+.buttons{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}button{background:var(--cyan);color:#03111d;border:0;border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer}button.secondary{background:#223a55;color:var(--text);border:1px solid var(--border)}button:disabled{opacity:.45;cursor:not-allowed}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.metric{background:var(--panel2);padding:12px;border-radius:10px}.metric small{display:block;color:var(--muted);margin-bottom:5px}.metric strong{font-size:20px}
+.note{font-size:12px;line-height:1.55;color:var(--muted);margin-top:15px}.steps{display:grid;gap:8px}.step{padding:10px 12px;background:#0c192a;border:1px solid var(--border);border-radius:9px;color:var(--muted)}.step.active{border-color:var(--cyan);color:var(--text);background:#123047}.step.done{border-color:#277b73;color:#a5f4dc}
+progress{width:100%;height:10px;accent-color:var(--cyan)}footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.controls{grid-template-columns:1fr 1fr}}@media(max-width:450px){.controls{grid-template-columns:1fr}.field.full{grid-column:auto}}
 </style>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
 </head>
 <body>
-<header><b>⚙ MACHINES MAN — MILLING MACHINE SIMULATION</b><a href="./index.html">← Back to Machine Directory</a></header>
-<main><section class="panel">
-<h2>Workpiece setup</h2><p class="hint">Select a milling operation, set stock dimensions and run the virtual cutter to see approximate material removal.</p>
-<label>Operation</label><select id="op"><option value="pocket">Pocket milling</option><option value="slot">Straight slot</option><option value="face">Face milling</option></select>
-<div class="row"><div><label>Length X (mm)</label><input id="L" type="number" min="40" max="160" value="100"></div><div><label>Width Z (mm)</label><input id="W" type="number" min="30" max="120" value="60"></div></div>
-<label>Stock height Y (mm)</label><input id="H" type="number" min="10" max="50" value="20"><button id="create">Create / Reset Stock</button>
-<h2 style="margin-top:22px">Tool parameters</h2><div class="row"><div><label>Tool diameter</label><select id="dia"><option>6</option><option>8</option><option selected>10</option><option>12</option></select></div><div><label>Cut depth (mm)</label><input id="depth" type="number" min="1" max="12" value="4"></div></div>
-<label>Spindle speed (RPM)</label><input id="rpm" type="number" min="500" max="12000" step="500" value="3000">
-<label>Feed speed (visual)</label><input id="feed" type="range" min="1" max="10" value="5"><p class="hint">Visual speed: <b id="fv">5</b>/10. RPM is informational only, not a real machining recommendation.</p>
-<div class="row"><button id="start">▶ Run</button><button id="pause" class="secondary" disabled>Ⅱ Pause</button></div><div class="row"><button id="resume" class="secondary" disabled>▶ Resume</button><button id="reset" class="secondary">↺ Reset</button></div>
-<div class="progress"><div id="bar"></div></div><p id="status">Preparing workpiece…</p>
-<div class="stats"><div class="stat">Progress<b id="pct">0%</b></div><div class="stat">Removed (approx.)<b id="vol">0 mm³</b></div><div class="stat">Spindle<b id="rpmt">3000 RPM</b></div></div>
-<p class="hint">Educational visualisation only. The voxel model and volume are approximate; this is not validated CNC software and does not generate safe machine-ready G-code.</p>
-</section><section class="viewer"><h2>3D milling view</h2><div id="view"></div><p class="hint">Drag to rotate and scroll to zoom. Green line = planned path; yellow cutter = virtual end mill.</p></section></main>
-<script type="module">
-import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-const $=id=>document.getElementById(id),view=$('view');const scene=new THREE.Scene();scene.background=new THREE.Color(0x091321);
-const camera=new THREE.PerspectiveCamera(45,view.clientWidth/view.clientHeight,.1,3000);camera.position.set(150,125,160);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(view.clientWidth,view.clientHeight);view.appendChild(renderer.domElement);
-const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;scene.add(new THREE.HemisphereLight(0xffffff,0x52647b,2));const light=new THREE.DirectionalLight(0xffffff,2);light.position.set(90,150,100);scene.add(light);scene.add(new THREE.GridHelper(260,26,0x42617e,0x26384e));
-const geo=new THREE.BoxGeometry(1,1,1),mat=new THREE.MeshStandardMaterial({color:0x8da9c6,metalness:.3,roughness:.4});let stock=null,tool=null,line=null,vox=[],pts=[],meta=null,removed=0,idx=0,off=0,distTotal=0,travel=0,state='idle',last=0,v=2.5;
-function say(s){$('status').textContent=s}
-function clear(){if(stock)scene.remove(stock);if(tool)scene.remove(tool);if(line){scene.remove(line);line.geometry.dispose();line.material.dispose()}stock=tool=line=null;vox=[];pts=[];removed=idx=off=distTotal=travel=0;state='idle';$('start').disabled=false;$('pause').disabled=true;$('resume').disabled=true;$('bar').style.width='0%';$('pct').textContent='0%';$('vol').textContent='0 mm³'}
-function focus(){let m=Math.max(meta.L,meta.W,meta.H);camera.position.set(m*1.5,m*1.3,m*1.8);controls.target.set(0,0,0);controls.update()}
-function buildPath(){let r=Number($('dia').value)/2,d=Number($('depth').value);if(d<1||d>=meta.H||!Number.isFinite(d)){say('Cut depth must be at least 1 mm and less than stock height.');return false}let x0=-meta.L/2+r,x1=meta.L/2-r,z0=-meta.W/2+r,z1=meta.W/2-r,y=meta.H/2-d+.5;pts=[];let op=$('op').value;if(op==='slot')pts=[new THREE.Vector3(x0,y,0),new THREE.Vector3(x1,y,0)];else{let a=op==='face'?x0:-meta.L*.28,b=op==='face'?x1:meta.L*.28,c=op==='face'?z0:-meta.W*.25,e=op==='face'?z1:meta.W*.25,z=c,f=true;while(z<=e+.01){pts.push(new THREE.Vector3(f?a:b,y,z),new THREE.Vector3(f?b:a,y,z));f=!f;z+=Math.max(Number($('dia').value)*(op==='face'?.7:.65),v)}}if(pts.length<2)return false;line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x22c55e}));scene.add(line);for(let i=1;i<pts.length;i++)distTotal+=pts[i].distanceTo(pts[i-1]);return true}
-function create(){clear();let L=Number($('L').value),W=Number($('W').value),H=Number($('H').value);if(L<40||L>160||W<30||W>120||H<10||H>50){say('Use length 40–160, width 30–120 and height 10–50 mm.');return}meta={L,W,H};v=2.5;let nx=Math.floor(L/v),ny=Math.floor(H/v),nz=Math.floor(W/v);if(nx*ny*nz>18000)v=Math.cbrt(L*W*H/16000);nx=Math.floor(L/v);ny=Math.floor(H/v);nz=Math.floor(W/v);let n=nx*ny*nz;stock=new THREE.InstancedMesh(geo,mat,n);stock.instanceMatrix.setUsage(THREE.DynamicDrawUsage);stock.frustumCulled=false;let d=new THREE.Object3D(),i=0;for(let iy=0;iy<ny;iy++)for(let iz=0;iz<nz;iz++)for(let ix=0;ix<nx;ix++){let x=-L/2+(ix+.5)*v,y=-H/2+(iy+.5)*v,z=-W/2+(iz+.5)*v;d.position.set(x,y,z);d.scale.set(v,v,v);d.updateMatrix();stock.setMatrixAt(i,d.matrix);vox.push({x,y,z,alive:true,index:i++})}stock.count=n;stock.instanceMatrix.needsUpdate=true;scene.add(stock);tool=new THREE.Group();let shaft=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.2,16,20),new THREE.MeshStandardMaterial({color:0xd5dfeb,metalness:.8,roughness:.2}));shaft.position.y=8;tool.add(shaft);let cutter=new THREE.Mesh(new THREE.CylinderGeometry(Number($('dia').value)/2,Number($('dia').value)/2,5,24),new THREE.MeshStandardMaterial({color:0xfacc15,metalness:.6,roughness:.25}));cutter.position.y=-2.5;tool.add(cutter);scene.add(tool);if(!buildPath())return;tool.position.copy(pts[0]);focus();$('rpmt').textContent=(Number($('rpm').value)||0).toLocaleString()+' RPM';say('Workpiece ready. Press Run to start milling.')}
-function cut(p){let r=Number($('dia').value)/2,dummy=new THREE.Object3D(),changed=false;for(let q of vox){if(!q.alive)continue;let dx=q.x-p.x,dz=q.z-p.z;if(dx*dx+dz*dz<=(r+v*.45)**2&&q.y<=meta.H/2-.1&&q.y>=p.y-v*1.2&&Math.abs(q.y-p.y)<v*1.5){q.alive=false;dummy.position.set(0,-10000,0);dummy.scale.set(0,0,0);dummy.updateMatrix();stock.setMatrixAt(q.index,dummy.matrix);removed++;changed=true}}if(changed)stock.instanceMatrix.needsUpdate=true}
-function stats(){let p=distTotal?Math.min(100,Math.round(travel/distTotal*100)):0;$('bar').style.width=p+'%';$('pct').textContent=p+'%';$('vol').textContent=Math.round(removed*v**3).toLocaleString()+' mm³'}
-function run(){if(!stock||!pts.length){create();if(!stock||!pts.length)return}if(idx>=pts.length-1){create();if(!stock||!pts.length)return}state='running';$('start').disabled=true;$('pause').disabled=false;$('resume').disabled=true;say('Milling in progress…')}
-function step(dt){if(state!=='running')return;let left=Number($('feed').value)*7*dt;while(left>0&&idx<pts.length-1){let a=pts[idx],b=pts[idx+1],delta=b.clone().sub(a),len=delta.length(),rem=len-off;if(left<rem){off+=left;travel+=left;let p=a.clone().addScaledVector(delta,off/len);tool.position.copy(p);cut(p);left=0}else{left-=rem;travel+=rem;idx++;off=0;tool.position.copy(b);cut(b)}}stats();if(idx>=pts.length-1){state='done';$('start').disabled=false;$('pause').disabled=true;$('resume').disabled=true;say('Milling complete. Press Reset to restore the stock.')}}
-$('create').onclick=create;$('reset').onclick=create;$('start').onclick=run;$('pause').onclick=()=>{if(state==='running'){state='paused';$('pause').disabled=true;$('resume').disabled=false;say('Paused. Press Resume to continue.')}};$('resume').onclick=()=>{if(state==='paused'){state='running';$('pause').disabled=false;$('resume').disabled=true;say('Milling in progress…')}};$('feed').oninput=()=>$('fv').textContent=$('feed').value;$('rpm').onchange=()=>$('rpmt').textContent=(Number($('rpm').value)||0).toLocaleString()+' RPM';
-new ResizeObserver(()=>{if(!view.clientWidth||!view.clientHeight)return;camera.aspect=view.clientWidth/view.clientHeight;camera.updateProjectionMatrix();renderer.setSize(view.clientWidth,view.clientHeight)}).observe(view);
-function animate(t){requestAnimationFrame(animate);let dt=last?Math.min((t-last)/1000,.05):0;last=t;step(dt);controls.update();renderer.render(scene,camera)}create();animate();
-</script></body></html>
+<header><div class="logo">⚙ MACHINES <span>MAN</span></div><a href="index.html">← Back to Machines</a></header>
+<main>
+<section class="intro"><h1>Laser Cutting Machine Simulation</h1><p>Explore a simplified laser-cutting process. Choose a material and pattern, then run the visual simulation to see a laser head trace a path across a sheet.</p></section>
+<div class="layout">
+<section class="panel"><h2>Live cutting view</h2><div class="scene"><canvas id="scene" width="960" height="600" aria-label="Laser cutting simulation canvas"></canvas></div>
+<div class="status"><span class="pill" id="status">Ready</span><span id="phase">Phase: Setup</span></div>
+<label for="progress">Cutting progress</label><progress id="progress" max="100" value="0"></progress>
+<div class="metrics"><div class="metric"><small>Progress</small><strong id="percent">0%</strong></div><div class="metric"><small>Elapsed time</small><strong id="elapsed">0.0 s</strong></div><div class="metric"><small>Path length</small><strong id="pathLength">0 mm</strong></div><div class="metric"><small>Estimated cut time</small><strong id="estimated">0.0 s</strong></div></div>
+<div class="buttons"><button id="start">▶ Start cutting</button><button class="secondary" id="pause" disabled>Ⅱ Pause</button><button class="secondary" id="reset">↺ Reset</button></div>
+</section>
+<aside class="panel"><h2>Machine settings</h2><div class="controls">
+<div class="field"><label for="material">Sheet material</label><select id="material"><option value="Mild steel">Mild steel (demo)</option><option value="Stainless steel">Stainless steel (demo)</option><option value="Acrylic">Acrylic (demo)</option><option value="Plywood">Plywood (demo)</option></select></div>
+<div class="field"><label for="pattern">Cutting pattern</label><select id="pattern"><option value="rectangle">Rectangle</option><option value="circle">Circle</option><option value="star">Star</option><option value="letters">Simple initials path</option></select></div>
+<div class="field full"><label for="power">Laser power (visual setting) <span class="value" id="powerValue">70%</span></label><input id="power" type="range" min="10" max="100" value="70"></div>
+<div class="field full"><label for="speed">Cutting speed <span class="value" id="speedValue">60 mm/s</span></label><input id="speed" type="range" min="10" max="120" value="60"></div>
+<div class="field full"><label for="scale">Pattern size <span class="value" id="scaleValue">70%</span></label><input id="scale" type="range" min="40" max="90" value="70"></div>
+</div>
+<h2 style="margin-top:24px">Process stages</h2><div class="steps" id="steps"><div class="step active">1. Secure sheet and set pattern</div><div class="step">2. Laser head moves to start point</div><div class="step">3. Laser follows the programmed path</div><div class="step">4. Cutting path completed</div></div>
+<p class="note">Educational visualisation only. It does not calculate real laser parameters, material compatibility, kerf, gas pressure, or safe machine settings. Never use these demo settings to operate a real laser cutter. Real laser equipment requires trained supervision, enclosure, extraction, and material-specific safety procedures.</p>
+</aside>
+</div>
+<footer>Machines Man · Interactive learning prototype</footer>
+</main>
+<script>
+const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id);
+let running=false,paused=false,progress=0,elapsed=0,last=0,raf=null,paths=[],totalLength=0;
+function makePaths(){
+ const s=+$('scale').value/100,cx=480,cy=300,w=340*s,h=220*s;
+ if($('pattern').value==='rectangle')return [[{x:cx-w/2,y:cy-h/2},{x:cx+w/2,y:cy-h/2},{x:cx+w/2,y:cy+h/2},{x:cx-w/2,y:cy+h/2},{x:cx-w/2,y:cy-h/2}]];
+ if($('pattern').value==='circle'){let a=[];for(let i=0;i<=120;i++){let t=i/120*Math.PI*2;a.push({x:cx+145*s*Math.cos(t),y:cy+145*s*Math.sin(t)});}return [a];}
+ if($('pattern').value==='star'){let a=[];for(let i=0;i<=10;i++){let t=-Math.PI/2+i*Math.PI/5,r=(i%2===0?160:70)*s;a.push({x:cx+r*Math.cos(t),y:cy+r*Math.sin(t)});}return [a];}
+ return [[{x:cx-120*s,y:cy-70*s},{x:cx-120*s,y:cy+70*s},{x:cx-55*s,y:cy-70*s},{x:cx-55*s,y:cy+70*s}], [{x:cx+10*s,y:cy-70*s},{x:cx+10*s,y:cy+70*s},{x:cx+110*s,y:cy+70*s},{x:cx+110*s,y:cy-70*s}]];
+}
+function lengthPath(p){let n=0;for(let i=1;i<p.length;i++)n+=Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y);return n}
+function setup(){paths=makePaths();totalLength=paths.reduce((a,p)=>a+lengthPath(p),0);$('pathLength').textContent=Math.round(totalLength/2)+' mm';$('estimated').textContent=(totalLength/2/(+$('speed').value)).toFixed(1)+' s';draw();}
+function pointAt(t){let remain=totalLength*t;for(const p of paths){for(let i=1;i<p.length;i++){let d=Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y);if(remain<=d){let q=d?remain/d:0;return{x:p[i-1].x+(p[i].x-p[i-1].x)*q,y:p[i-1].y+(p[i].y-p[i-1].y)*q};}remain-=d;}}return paths[paths.length-1].at(-1)}
+function draw(){
+ const W=canvas.width,H=canvas.height;ctx.clearRect(0,0,W,H);
+ // bed and metal sheet
+ ctx.fillStyle='#172638';ctx.fillRect(55,55,850,490);
+ ctx.strokeStyle='#2c4861';ctx.lineWidth=2;for(let x=75;x<900;x+=28){ctx.beginPath();ctx.moveTo(x,65);ctx.lineTo(x,535);ctx.stroke();}
+ ctx.fillStyle=$('material').value==='Acrylic'?'#284d68':$('material').value==='Plywood'?'#76583b':'#64788a';ctx.fillRect(115,95,730,410);
+ ctx.strokeStyle='#91a6b8';ctx.lineWidth=2;ctx.strokeRect(115,95,730,410);
+ // subtle sheet grid
+ ctx.strokeStyle='rgba(230,245,255,.10)';ctx.lineWidth=1;for(let x=135;x<845;x+=35){ctx.beginPath();ctx.moveTo(x,105);ctx.lineTo(x,495);ctx.stroke();}for(let y=115;y<500;y+=35){ctx.beginPath();ctx.moveTo(125,y);ctx.lineTo(835,y);ctx.stroke();}
+ // completed cutting path
+ let remain=progress*totalLength;
+ for(const p of paths){ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);for(let i=1;i<p.length;i++)ctx.lineTo(p[i].x,p[i].y);ctx.strokeStyle='rgba(9,20,31,.95)';ctx.lineWidth=7;ctx.stroke();
+   let local=Math.min(remain,lengthPath(p));ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);for(let i=1;i<p.length;i++){let d=Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y);if(local>=d){ctx.lineTo(p[i].x,p[i].y);local-=d;}else{let q=d?local/d:0;ctx.lineTo(p[i-1].x+(p[i].x-p[i-1].x)*q,p[i-1].y+(p[i].y-p[i-1].y)*q);break;}}ctx.strokeStyle='#ff9b72';ctx.lineWidth=3;ctx.shadowColor='#ff4c35';ctx.shadowBlur=8;ctx.stroke();ctx.shadowBlur=0;remain-=Math.min(remain,lengthPath(p));}
+ let pos=pointAt(progress); // gantry and laser head
+ ctx.strokeStyle='#a9bed0';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(pos.x-48,48);ctx.lineTo(pos.x+48,48);ctx.stroke();
+ ctx.fillStyle='#c7d8e8';ctx.fillRect(pos.x-24,45,48,38);ctx.fillStyle='#7b91a5';ctx.fillRect(pos.x-14,80,28,23);
+ ctx.strokeStyle='#ff5a62';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(pos.x,pos.y-35);ctx.lineTo(pos.x,pos.y-5);ctx.stroke();
+ ctx.fillStyle='#ff554b';ctx.shadowColor='#ff3020';ctx.shadowBlur=20;ctx.beginPath();ctx.arc(pos.x,pos.y,7+Math.random()*2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+ ctx.fillStyle='#dceafa';ctx.font='16px Arial';ctx.fillText('LASER HEAD',pos.x+30,70);
+ ctx.fillStyle='rgba(5,12,20,.75)';ctx.fillRect(125,455,210,30);ctx.fillStyle='#eaf4ff';ctx.font='14px Arial';ctx.fillText('Sheet bed · Top view',138,475);
+}
+function updateUI(){let p=Math.round(progress*100);$('progress').value=p;$('percent').textContent=p+'%';$('elapsed').textContent=elapsed.toFixed(1)+' s';$('status').textContent=progress>=1?'Completed':paused?'Paused':running?'Cutting':'Ready';$('phase').textContent='Phase: '+(progress>=1?'Complete':progress>0?'Cutting path': 'Setup');$('pause').disabled=!running;const steps=[...document.querySelectorAll('.step')];steps.forEach((e,i)=>{e.classList.toggle('active',i===(progress>=1?3:progress>0?2:0));e.classList.toggle('done',i<(progress>=1?4:progress>0?2:0));});}
+function tick(now){if(!running)return;if(!last)last=now;let dt=Math.min((now-last)/1000,.1);last=now;elapsed+=dt;progress=Math.min(1,progress+dt*(+$('speed').value)/Math.max(totalLength/2,1));draw();updateUI();if(progress>=1){running=false;paused=false;updateUI();return;}raf=requestAnimationFrame(tick)}
+$('start').onclick=()=>{if(progress>=1){progress=0;elapsed=0;}running=true;paused=false;last=0;updateUI();raf=requestAnimationFrame(tick)};
+$('pause').onclick=()=>{running=false;paused=true;if(raf)cancelAnimationFrame(raf);updateUI();};
+$('reset').onclick=()=>{running=false;paused=false;progress=0;elapsed=0;last=0;if(raf)cancelAnimationFrame(raf);setup();updateUI();};
+['material','pattern','scale'].forEach(id=>$(id).addEventListener('input',()=>{if(!running){progress=0;elapsed=0;setup();updateUI();}}));
+$('power').oninput=()=>{$('powerValue').textContent=$('power').value+'%';draw()};
+$('speed').oninput=()=>{$('speedValue').textContent=$('speed').value+' mm/s';$('estimated').textContent=(totalLength/2/(+$('speed').value)).toFixed(1)+' s'};
+$('scale').oninput=()=>{$('scaleValue').textContent=$('scale').value+'%';};
+setup();updateUI();
+</script>
+</body>
+</html>
